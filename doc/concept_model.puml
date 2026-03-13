@@ -1,0 +1,35 @@
+@startuml
+title Conceptual Model - Coffee Delivery Robot
+
+class Camera {
+  -isActive: bool
+  +captureFrame()
+}
+
+class Processor {
+  +findHuman()
+  +findRobot()
+  +findDispenser()
+  +recognizeGesture()
+}
+
+class Robot {
+  -position: int, int
+  +moveTo()
+  +stop()
+}
+
+class Dispenser {
+  +dispenseCoffee()
+}
+
+class Server {
+  +processOrder()
+}
+
+Server --> Camera : uses
+Server --> Processor : uses
+Server --> Robot : controls
+Server --> Dispenser : controls
+
+@enduml

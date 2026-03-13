@@ -1,0 +1,33 @@
+@startuml
+actor Пользователь
+participant "Камера" as Camera
+participant "Сервер" as Server
+participant "Робот" as Robot
+participant "Диспенсер" as Dispenser
+
+Пользователь -> Server: 1. Запуск системы
+activate Server
+
+Server -> Camera: 2. Запрос кадра
+activate Camera
+Camera -> Server: 3. Передача кадра
+deactivate Camera
+
+Server -> Server: 4. Распознавание объектов\n(человек, робот, диспенсер)
+Server -> Server: 5. Распознавание жеста
+Server -> Server: 6. Расчет траектории
+
+Server -> Robot: 7. Команда движения
+activate Robot
+Robot -> Server: 8. Подтверждение
+deactivate Robot
+
+Server -> Dispenser: 9. Команда подачи
+activate Dispenser
+Dispenser -> Server: 10. Подтверждение
+deactivate Dispenser
+
+Server -> Server: 11. Логирование
+Server -> Пользователь: 12. Отчет о выполнении
+deactivate Server
+@enduml
