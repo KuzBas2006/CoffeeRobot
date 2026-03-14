@@ -5,11 +5,6 @@ struct Position {
 };
 
 class Processor {
-private:
-    Position humanPos;
-    Position robotPos;
-    Position dispenserPos;
-    
 public:
     Processor();
     void findHuman();
@@ -19,4 +14,8 @@ public:
     Position getHumanPos();
     Position getRobotPos();
     Position getDispenserPos();
+private:
+    Position humanPos;
+    Position robotPos;
+    Position dispenserPos;
 };

@@ -6,12 +6,11 @@
 #include "dispenser.h"
 
 class Server {
+public:
+    void processOrder();
 private:
     Camera camera;
     Processor processor;
     Robot robot;
     Dispenser dispenser;
-    
-public:
-    void processOrder();
 };
