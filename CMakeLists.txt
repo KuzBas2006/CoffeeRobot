@@ -4,19 +4,7 @@ project(CoffeeRobot)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-# Подключаем RapidJSON через FetchContent
-include(FetchContent)
-
-FetchContent_Declare(
-    rapidjson
-    GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
-    GIT_TAG v1.1.0
-)
-
-FetchContent_MakeAvailable(rapidjson)
 
 set(SOURCES
     ./src/main.cpp
@@ -35,8 +23,18 @@ set(HEADERS
     ./src/dispenser.h
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADES})
+# Подключаем nlohmann/json через FetchContent
+include(FetchContent)
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.11.3
+    GIT_SHALLOW TRUE
+)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${rapidjson_SOURCE_DIR}/include)
+FetchContent_MakeAvailable(nlohmann_json)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE RAPIDJSON_HAS_STDSTRING=1)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+
+# Подключаем nlohmann/json
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
