@@ -28,13 +28,30 @@ include(FetchContent)
 FetchContent_Declare(
     nlohmann_json
     GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG v3.11.3
     GIT_SHALLOW TRUE
 )
 
 FetchContent_MakeAvailable(nlohmann_json)
 
+FetchContent_Declare(
+  httplib
+  GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
+  GIT_SHALLOW    TRUE
+  GIT_TAG v0.21.0 # Use a specific tag, commit hash, or branch
+)
+  
+FetchContent_MakeAvailable(httplib)
+
+
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+
+# On Windows ensure WSAPoll is exposed and link Winsock library
+if (WIN32)
+  # Require at least Windows 7 APIs (WSAPoll is available on Vista+/Server2008+)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0601 WIN32_LEAN_AND_MEAN)
+  target_link_libraries(${PROJECT_NAME} PRIVATE Ws2_32)
+endif()
 
 # Подключаем nlohmann/json
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME} PRIVATE httplib)
