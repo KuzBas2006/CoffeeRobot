@@ -1,30 +1,18 @@
-import requests
+import recognition
+import processState
+from src.processState import process_state
+from src.recognition import QRScanner
 import json
 
-# URL C++ сервера
-url = "http://localhost:8080/api/data"
+if __name__ == "__main__":
 
-# Формируем JSON сообщение
-data = {
-    "message": "Привет",
-    "value": 42,
-    "items": ["один", "два", "три"]
-}
+    ang = 45
+    dist = 70
 
-# Отправляем POST запрос с JSON
-try:
-    response = requests.post(url, json=data)
+    data = {
+        "angle": ang,
+        "distance": dist
+    }
+    json_string = json.dumps(data)
 
-    # Проверяем статус ответа
-    if response.status_code == 200:
-        print("Успешно отправлено!")
-        print("Ответ от C++ сервера:")
-        print(json.dumps(response.json(), indent=4, ensure_ascii=False))
-    else:
-        print(f"Ошибка HTTP {response.status_code}")
-        print(response.text)
-
-except requests.exceptions.ConnectionError:
-    print("Ошибка: Не удалось подключиться к C++ серверу. Убедитесь, что он запущен.")
-except Exception as e:
-    print(f"Произошла ошибка: {e}")
+    process_state(json_string)
