@@ -4,6 +4,9 @@ import numpy as np
 import json
 from datetime import datetime
 import math
+import findRect
+from src.findRect import find_scale
+
 
 class QRCode:
     """Хранит данные одного QR-кода"""
@@ -229,6 +232,10 @@ class QRScanner:
                         if text not in self.scanned_codes:
                             self.scanned_codes.append(text)
                             print(f"Найден: {text} -> {qr.role}")
+
+                #scale = find_scale(frame)
+                #print(scale)
+
 
             # Обновляем данные робота
             self.robot.update_qr_codes(qr_objects)
@@ -551,12 +558,23 @@ class GeometryCalculator:
         return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
     def angle_between_lines(self, line1_p1, line1_p2, line2_p1, line2_p2):
-        v1 = (line1_p2[0] - line1_p1[0], line1_p2[1] - line1_p1[1])
-        v2 = (line2_p2[0] - line2_p1[0], line2_p2[1] - line2_p1[1])
-        dot = v1[0] * v2[0] + v1[1] * v2[1]
-        len1 = math.sqrt(v1[0] ** 2 + v1[1] ** 2)
-        len2 = math.sqrt(v2[0] ** 2 + v2[1] ** 2)
-        return math.degrees(math.acos(dot / (len1 * len2)))
+        # Вектор направления робота
+        robot_dir = (line1_p1[0] - line1_p2[0], line1_p1[1] - line1_p2[1])
+        # Вектор от робота до цели
+        to_target = (line2_p2[0] - line2_p1[0], line2_p2[1] - line2_p1[1])
+
+        robot_angle = math.atan2(robot_dir[1], robot_dir[0])
+        target_angle = math.atan2(to_target[1], to_target[0])
+
+        diff = target_angle - robot_angle
+        diff = math.degrees(diff)
+
+        if diff > 180:
+            diff -= 360
+        elif diff < -180:
+            diff += 360
+
+        return diff  # Положительный = против часовой, отрицательный = по часовой
 
     def angle_between_points(self, p1, p2):
         return math.degrees(math.atan2(p2[1] - p1[1], p2[0] - p1[0]))
