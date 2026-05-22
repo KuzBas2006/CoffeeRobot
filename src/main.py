@@ -533,6 +533,7 @@ import time
 from processState import process_state
 import json
 
+last_sent = 0.0
 
 class QRCode:
     def __init__(self, text, center, pts):
@@ -678,6 +679,7 @@ class QRScanner:
             print(output)
 
     def run(self):
+        global last_sent
         cap = cv2.VideoCapture(0)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -753,7 +755,8 @@ class QRScanner:
 
                 distance = self.robot.get_distance_to_object()
                 angle = self.robot.get_angle_to_object()
-                if distance and angle:
+                time_diff = time.time() - last_sent
+                if distance and angle and time_diff > 0.5:
                     self.print_results(robot_center, object_center, distance, angle)
                     data = {
                         "angle": angle,
@@ -762,6 +765,7 @@ class QRScanner:
                     json_string = json.dumps(data)
 
                     process_state(json_string)
+                    last_sent = time.time()
             else:
                 missing = []
                 if not self.robot.front_qr: missing.append("FRONT")

@@ -8,7 +8,9 @@ state = "ready"
 
 # Конфигурация
 MIN_ANGLE = 10.0
-MIN_DISTANCE =15.0
+MIN_DISTANCE = 50.0
+ANGLE_K = 5.0
+FORWARD_DUR = 400.0
 
 
 def process_state(json_input):
@@ -23,27 +25,33 @@ def process_state(json_input):
     if abs(angle) > MIN_ANGLE:
         if angle > 0:
             cmd = {
-                "RIGHT": angle
+                "command": "RIGHT/ms",
+                "duration": angle * ANGLE_K
             }
         else:
             cmd = {
-                "LEFT": abs(angle)
+                "command": "LEFT/ms",
+                "duration": abs(angle) * ANGLE_K
             }
         send_cmd(cmd)
-        time.sleep(abs(angle) // 45)
         state = "rotating"
         return None
-
 
 
     # Состояние 2: Проверка дистанции
     if distance > MIN_DISTANCE:
         cmd = {
-            "MOVE": distance
+            "command": "FORWARD/ms",
+            "duration": FORWARD_DUR
         }
         send_cmd(cmd)
-        time.sleep(1)
         state = "moving"
+    else:
+        cmd = {
+            "command": "STOP",
+            "duration": 0
+        }
+        send_cmd(cmd)
 
     # Сбрасываем состояние
     state = "ready"
