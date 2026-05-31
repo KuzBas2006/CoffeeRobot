@@ -8,9 +8,9 @@ state = "ready"
 
 # Конфигурация
 MIN_ANGLE = 10.0
-MIN_DISTANCE = 50.0
-ANGLE_K = 5.0
-FORWARD_DUR = 400.0
+MIN_DISTANCE = 80.0
+ANGLE_K = 1.7
+FORWARD_DUR = 550.0
 
 
 def process_state(json_input):

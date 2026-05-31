@@ -3,12 +3,12 @@ import json
 
 
 def send_cmd(cmd):
-    # URL C++ сервера
-    url = "http://localhost:8080/api/data"
+    # URL робота
+    url = "http://192.168.1.101:8080/commands"
 
     # Отправляем POST запрос с JSON
     try:
-        response = requests.post(url, json=cmd)
+        response = requests.post(url, json=cmd, timeout=0.2)
 
         # Проверяем статус ответа
         if response.status_code == 200:

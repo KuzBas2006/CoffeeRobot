@@ -61,8 +61,8 @@ int main() {
         }
     });
 
-    std::cout << "Server listening on http://localhost:8080" << std::endl;
-    svr.listen("0.0.0.0", 8080);
+    std::cout << "Server listening on http://192.168.1.101:8080" << std::endl;
+    svr.listen("192.168.1.101", 8080);
 
     robot_gpio_cleanup();
     return 0;

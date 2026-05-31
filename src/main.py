@@ -7,6 +7,7 @@ import json
 
 last_sent = 0.0
 
+
 class QRCode:
     def __init__(self, text, center, pts):
         self.text = text
@@ -16,12 +17,34 @@ class QRCode:
         self.last_seen = time.time()
 
     def _detect_role(self):
-        if 'front' in self.text.lower() or 'перед' in self.text.lower():
-            return 'front'
-        elif 'back' in self.text.lower() or 'зад' in self.text.lower():
-            return 'back'
-        elif 'object' in self.text.lower() or 'объект' in self.text.lower() or 'target' in self.text.lower():
-            return 'object'
+        # Оригинальный текст (для точного сравнения)
+        text_original = self.text
+        text_lower = self.text.lower()
+
+        # Точное сравнение с оригинальным текстом
+        if text_original == 'Forward':
+            return 'Forward'
+        elif text_original == 'Backward':
+            return 'Backward'
+        elif text_original == 'Goal 2':
+            return 'Goal 2'
+
+        # Сравнение в нижнем регистре
+        if text_lower == 'forward':
+            return 'Forward'
+        elif text_lower == 'backward':
+            return 'Backward'
+        elif text_lower == 'goal 2' or text_lower == 'goal2':
+            return 'Goal 2'
+
+        # Частичное совпадение (для надёжности)
+        if 'forward' in text_lower or 'front' in text_lower or 'перед' in text_lower:
+            return 'Forward'
+        elif 'backward' in text_lower or 'back' in text_lower or 'зад' in text_lower:
+            return 'Backward'
+        elif 'goal' in text_lower or 'coffee' in text_lower or 'кофе' in text_lower:
+            return 'Goal 2'
+
         return 'unknown'
 
 
@@ -70,11 +93,11 @@ class RobotCalculator:
         current_time = time.time()
 
         for qr in qr_codes:
-            if qr.role == 'front':
+            if qr.role == 'Forward':
                 self.front_qr = qr
-            elif qr.role == 'back':
+            elif qr.role == 'Backward':
                 self.back_qr = qr
-            elif qr.role == 'object':
+            elif qr.role == 'Goal 2':
                 self.object_qr = qr
 
         if self.front_qr and current_time - self.front_qr.last_seen > self.timeout:
@@ -152,13 +175,12 @@ class QRScanner:
 
     def run(self):
         global last_sent
-        cap = cv2.VideoCapture(0)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
-        if not cap.isOpened():
-            print("Ошибка: камера не найдена")
-            return None
+        CAMERA_URL = "http://192.168.1.103:8080/video"
+        #cap = cv2.VideoCapture(CAMERA_URL)
+        cap = cv2.VideoCapture(1)
+
+        #cap = cv2.VideoCapture(0)
 
         print("Сканирование запущено. Нажмите Q для выхода.")
 
@@ -179,13 +201,13 @@ class QRScanner:
                         qr = QRCode(text, (center_x, center_y), pts)
                         qr_objects.append(qr)
 
-                        if qr.role == 'front':
+                        if qr.role == 'Forward':
                             color = (0, 255, 0)
                             label = "FRONT"
-                        elif qr.role == 'back':
+                        elif qr.role == 'Backward':
                             color = (0, 0, 255)
                             label = "BACK"
-                        elif qr.role == 'object':
+                        elif qr.role == 'Goal 2':
                             color = (255, 0, 0)
                             label = "TARGET"
                         else:
@@ -228,7 +250,7 @@ class QRScanner:
                 distance = self.robot.get_distance_to_object()
                 angle = self.robot.get_angle_to_object()
                 time_diff = time.time() - last_sent
-                if distance and angle and time_diff > 0.5:
+                if distance and angle and time_diff > 0.25:
                     self.print_results(robot_center, object_center, distance, angle)
                     data = {
                         "angle": angle,
@@ -256,7 +278,6 @@ class QRScanner:
 
         cap.release()
         cv2.destroyAllWindows()
-        return None
 
 
 class App:
