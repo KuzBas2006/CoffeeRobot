@@ -24,3 +24,4 @@
 `chmod +x /home/user/CoffeeRobot`
 
 `sudo /home/user/CoffeeRobot`
+
